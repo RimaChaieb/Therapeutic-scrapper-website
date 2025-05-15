@@ -1,0 +1,198 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const scraperForm = document.getElementById('scraperForm');
+    const scrapeButton = document.getElementById('scrapeButton');
+    const spinner = document.getElementById('spinner');
+    const successAlert = document.getElementById('successAlert');
+    const resultsPreview = document.getElementById('resultsPreview');
+
+    if (scraperForm) {
+        scraperForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // UI State Management
+            spinner.classList.remove('d-none');
+            scrapeButton.disabled = true;
+            successAlert.classList.add('d-none');
+            resultsPreview.innerHTML = '';
+            
+            // Get form data
+            const keywords = document.getElementById('keywords').value;
+            const limit = document.getElementById('postLimit').value;
+            
+            try {
+                const response = await fetch('/scrape', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        keywords: keywords,
+                        limit: limit
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Analysis failed');
+                }
+
+                if (data.status === 'success') {
+                    successAlert.classList.remove('d-none');
+                    
+                    if (data.count > 0) {
+                        resultsPreview.innerHTML = `
+                            <div class="card mt-3">
+                                <div class="card-header bg-success text-white">
+                                    <h5>Analysis Preview (${data.count} posts analyzed)</h5>
+                                </div>
+                                <div class="card-body">
+                                    ${data.preview.map(post => `
+                                        <div class="mb-3 p-3 border rounded">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <span class="badge ${getSentimentClass(post.sentiment)}">
+                                                        ${post.sentiment}
+                                                    </span>
+                                                    <small class="text-muted ms-2">
+                                                        r/${post.subreddit} • ${new Date(post.date).toLocaleString()}
+                                                    </small>
+                                                </div>
+                                                <span class="badge bg-info">
+                                                    ▲ ${post.upvotes} • 💬 ${post.comments}
+                                                </span>
+                                            </div>
+                                            <h6 class="mt-2">${post.title}</h6>
+                                            <button class="btn btn-sm btn-outline-primary mt-2 analyze-post"
+                                                    data-content="${escapeHtml(post.content)}">
+                                                View Analysis
+                                            </button>
+                                        </div>
+                                    `).join('')}
+                                    <a href="/dashboard" class="btn btn-primary mt-2">View Full Dashboard</a>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            } catch (error) {
+                resultsPreview.innerHTML = `
+                    <div class="alert alert-danger mt-3">
+                        <strong>Error:</strong> ${error.message}
+                        ${error.message.includes('API') ? '<div class="mt-2">Check your API keys and quotas</div>' : ''}
+                    </div>
+                `;
+            } finally {
+                spinner.classList.add('d-none');
+                scrapeButton.disabled = false;
+            }
+        });
+    }
+
+    // Handle post analysis clicks
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('analyze-post')) {
+            const content = e.target.dataset.content;
+            const modal = new bootstrap.Modal(document.getElementById('analysisModal'));
+            const analysisContent = document.getElementById('analysisContent');
+            const analysisSpinner = document.getElementById('analysisSpinner');
+            
+            analysisContent.innerHTML = `
+                <div class="mb-3">
+                    <h6>Original Post</h6>
+                    <div class="p-3 bg-light rounded">
+                        ${content}
+                    </div>
+                </div>
+                <div id="geminiAnalysis"></div>
+            `;
+            
+            const geminiAnalysis = document.getElementById('geminiAnalysis');
+            geminiAnalysis.innerHTML = '';
+            analysisSpinner.classList.remove('d-none');
+            modal.show();
+            
+            // Get analysis from backend
+            fetch('/analyze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: content
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    geminiAnalysis.innerHTML = `
+                        <div class="mt-3">
+                            <h6>Therapeutic Analysis</h6>
+                            <div class="p-3 bg-info bg-opacity-10 rounded">
+                                ${data.insight}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    geminiAnalysis.innerHTML = `
+                        <div class="alert alert-warning">
+                            Analysis failed: ${data.message}
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                geminiAnalysis.innerHTML = `
+                    <div class="alert alert-danger">
+                        Error: ${error.message}
+                    </div>
+                `;
+            })
+            .finally(() => {
+                analysisSpinner.classList.add('d-none');
+            });
+        }
+    });
+
+    // Helper functions
+    function getSentimentClass(sentiment) {
+        switch(sentiment) {
+            case 'POSITIVE': return 'bg-success';
+            case 'NEGATIVE': return 'bg-danger';
+            default: return 'bg-secondary';
+        }
+    }
+
+    function escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+    function displaySentiment(sentiment, score) {
+        const formattedScore = Math.round(score * 100);
+        let sentimentClass;
+        
+        switch(sentiment) {
+            case 'POSITIVE': sentimentClass = 'bg-success'; break;
+            case 'NEGATIVE': sentimentClass = 'bg-danger'; break;
+            default: sentimentClass = 'bg-secondary';
+        }
+        
+        return `<div class="d-flex align-items-center">
+                  <span class="badge ${sentimentClass} me-2">${sentiment}</span>
+                  <div class="progress flex-grow-1" style="height: 8px;">
+                    <div class="progress-bar ${sentimentClass}" 
+                         role="progressbar" 
+                         style="width: ${formattedScore}%" 
+                         aria-valuenow="${formattedScore}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100"></div>
+                  </div>
+                  <small class="ms-2">${formattedScore}%</small>
+                </div>`;
+    }
+});
+       
