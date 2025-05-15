@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section text-center py-5 bg-light rounded">
+    <h1 class="display-4">Reddit Mental Health Monitor</h1>
+    <p class="lead">Analyze therapeutic discussions from Reddit</p>
+</div>
+
+<div class="scraper-form mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3>Configure Your Search</h3>
+        </div>
+        <div class="card-body">
+            <form id="scraperForm">
+                <div class="mb-3">
+                    <label for="keywords" class="form-label">Mental Health Keywords</label>
+                    <input type="text" class="form-control" id="keywords" 
+                           placeholder="e.g. depression, anxiety, therapy, trauma" required>
+                    <div class="form-text">Separate keywords with commas</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="postLimit" class="form-label">Posts per Subreddit</label>
+                    <select class="form-select" id="postLimit">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="scrapeButton">
+                    <span class="spinner-border spinner-border-sm d-none" id="spinner"></span>
+                    Analyze Reddit Posts
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="alert alert-success mt-3 d-none" id="successAlert">
+        Analysis completed! <a href="/dashboard" class="alert-link">View results</a>
+    </div>
+
+    <div id="resultsPreview" class="mt-4"></div>
+</div>
+
+<!-- Analysis Modal -->
+<div class="modal fade" id="analysisModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Therapeutic Analysis</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border text-primary d-none" id="analysisSpinner" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+                <div id="analysisContent"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
