@@ -28,8 +28,76 @@
         <p>Reddit Mental Health Monitor &copy; 2023-2025 | For research purposes only</p>
     </footer>
 
+    <!-- Load Bootstrap first -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Then application scripts -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    
+    <!-- Analysis Modal - Common across pages -->
+    <div class="modal fade" id="analysisModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Therapeutic Analysis</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="cleanupAndCloseModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-center">
+                        <div class="spinner-border text-primary d-none" id="analysisSpinner" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div id="analysisContent"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="closeModalBtn" onclick="cleanupAndCloseModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Common modal handling code -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listener to close modal on button click
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', function() {
+                    cleanupAndCloseModal();
+                });
+            }
+            
+            // Also close modal when clicking on backdrop (if not already handled by Bootstrap)
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('modal-backdrop')) {
+                    cleanupAndCloseModal();
+                }
+            });
+            
+            // Helper function to properly clean up and close modal
+            window.cleanupAndCloseModal = function() {
+                const modalElement = document.getElementById('analysisModal');
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                
+                if (modal) {
+                    modal.hide();
+                    
+                    // Clean up any remaining backdrops after modal is hidden
+                    modalElement.addEventListener('hidden.bs.modal', function() {
+                        const backdrops = document.querySelectorAll('.modal-backdrop');
+                        backdrops.forEach(backdrop => {
+                            backdrop.remove();
+                        });
+                        document.body.classList.remove('modal-open');
+                        document.body.style.removeProperty('padding-right');
+                        document.body.style.removeProperty('overflow');
+                    }, {once: true});
+                }
+            }
+        });
+    </script>
+    
     {% block scripts %}{% endblock %}
 </body>
 </html>
