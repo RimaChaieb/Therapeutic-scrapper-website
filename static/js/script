@@ -1,10 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
+    
     const scraperForm = document.getElementById('scraperForm');
     const scrapeButton = document.getElementById('scrapeButton');
     const spinner = document.getElementById('spinner');
     const successAlert = document.getElementById('successAlert');
     const resultsPreview = document.getElementById('resultsPreview');
-
+    
     if (scraperForm) {
         scraperForm.addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -194,5 +195,6 @@ document.addEventListener('DOMContentLoaded', function() {
                   <small class="ms-2">${formattedScore}%</small>
                 </div>`;
     }
+    
 });
        
