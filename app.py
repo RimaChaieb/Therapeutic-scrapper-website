@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from scraper.reddit_scraper import RedditScraper
-from scraper.gemini_analyzer import GeminiAnalyzer  # Fixed import
+from scraper.gemini_analyzer import GeminiAnalyzer  
 from scraper.sentiment_analyzer import SentimentAnalyzer
 import os
 import json
