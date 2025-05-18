@@ -109,28 +109,6 @@
     </div>
 </div>
 
-<!-- Analysis Modal -->
-<div class="modal fade" id="analysisModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Therapeutic Analysis</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="d-flex justify-content-center">
-                    <div class="spinner-border text-primary d-none" id="analysisSpinner" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-                <div id="analysisContent"></div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
 {% endblock %}
 
 {% block scripts %}
@@ -210,7 +188,6 @@
         document.querySelectorAll('.analyze-post').forEach(button => {
             button.addEventListener('click', function() {
                 const content = this.dataset.content;
-                const modal = new bootstrap.Modal(document.getElementById('analysisModal'));
                 const analysisContent = document.getElementById('analysisContent');
                 const analysisSpinner = document.getElementById('analysisSpinner');
                 
@@ -227,6 +204,28 @@
                 const geminiAnalysis = document.getElementById('geminiAnalysis');
                 geminiAnalysis.innerHTML = '';
                 analysisSpinner.classList.remove('d-none');
+                
+                // Create a fresh modal instance
+                const modalElement = document.getElementById('analysisModal');
+                const existingModal = bootstrap.Modal.getInstance(modalElement);
+                
+                // Dispose existing modal if it exists
+                if (existingModal) {
+                    existingModal.dispose();
+                }
+                
+                // Clean up any remaining backdrops
+                document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+                    backdrop.remove();
+                });
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('padding-right');
+                
+                // Create and show a new modal instance
+                const modal = new bootstrap.Modal(modalElement, {
+                    backdrop: 'static',
+                    keyboard: false
+                });
                 modal.show();
                 
                 // Get analysis from backend
@@ -284,11 +283,19 @@
                 })
                 .finally(() => {
                     analysisSpinner.classList.add('d-none');
+                    
+                    // Make sure the modal close button works properly
+                    const closeButtons = document.querySelectorAll('[data-bs-dismiss="modal"], #closeModalBtn');
+                    closeButtons.forEach(button => {
+                        button.addEventListener('click', function() {
+                            cleanupAndCloseModal();
+                        }, { once: true });
+                    });
                 });
             });
         });
     });
-    
+
     // Export to CSV function
     function exportToCSV() {
         const rows = Array.from(document.querySelectorAll('#resultsTable tbody tr:not([style*="display: none"])'));
