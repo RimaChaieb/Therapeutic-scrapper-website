@@ -1,5 +1,4 @@
 # Therapeutic-scrapper-website
-# Reddit Mental Health Post Analyzer
 
 ## Overview
 
@@ -33,8 +32,8 @@ Before deploying this project, ensure you have the following:
 1.  **Clone the Repository:**
 
     ```bash
-    git clone <your_github_repository_url>
-    cd <project_directory_name>
+    git clone <https://github.com/RimaChaieb/Therapeutic-scrapper-website>
+    cd <Therapeutic-scrapper-website>
     ```
 
 2.  **Set up Environment Variables:**
@@ -47,12 +46,11 @@ Before deploying this project, ensure you have the following:
         REDDIT_USER_AGENT=<your_reddit_user_agent>  #  e.g., "My Mental Health App v1.0"
         GEMINI_API_KEY=<your_gemini_api_key>
         ```
-3.  **Create a Virtual Environment (Recommended):**
+3.  **Create a Virtual Environment:**
 
     ```bash
-    python3 -m venv venv
-    source venv/bin/activate  # On Linux/macOS
-    venv\Scripts\activate  # On Windows
+    python -m venv venv
+    venv\Scripts\activate 
     ```
 
 4.  **Install Dependencies:**
@@ -74,8 +72,7 @@ Before deploying this project, ensure you have the following:
         ```
 
     * **Access the application:**
-        * Open your web browser and go to `http://127.0.0.1:5000/`  (or the address shown in your terminal).
-        * If deploying to a remote server, make sure your server's firewall allows traffic on port `5000`, and use  `http://<your_server_ip>:5000/`  in your browser.
+        * Open your web browser and go to `http://127.0.0.1:5000/`
 
 
 ## Usage
