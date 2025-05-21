@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card"> <div class="card-header bg-primary text-white"> <h3>About Reddit Mental Health Monitor</h3> </div> <div class="card-body"> <p>This specialized web application analyzes mental health discussions across Reddit to provide researchers, therapists, and mental health professionals with valuable insights into public conversations about mental well-being.</p>
+    <h5 class="mt-4">Our Mission</h5>
+    <p>We aim to help mental health professionals better understand trending topics, common concerns, and emerging patterns in online mental health communities, enabling more informed and responsive care approaches.</p>
+    
+    <h5 class="mt-4">Key Features</h5>
+    <ul>
+        <li><strong>Targeted Content Collection:</strong> Scrapes relevant mental health discussions from subreddits like r/mentalhealth, r/depression, r/anxiety, r/therapy, and r/CPTSD</li>
+        <li><strong>AI-Powered Analysis:</strong> Uses Gemini AI to provide clinically-informed insights on each post</li>
+        <li><strong>Sentiment Analysis:</strong> Evaluates the emotional tone of discussions using NLP</li>
+        <li><strong>Keyword Extraction:</strong> Identifies trending mental health topics and concerns</li>
+        <li><strong>Smart Filtering:</strong> Automatically removes moderator announcements to focus on authentic user experiences</li>
+        <li><strong>Visual Dashboard:</strong> View comprehensive analytics of collected data</li>
+    </ul>
+    
+    <h5 class="mt-4">How It Works</h5>
+    <ol>
+        <li>Enter keywords related to mental health topics you're researching</li>
+        <li>Our system collects relevant discussions from mental health communities on Reddit</li>
+        <li>Advanced AI analyzes the content for clinical insights and emotional patterns</li>
+        <li>Review processed results in the interactive dashboard</li>
+        <li>Use these insights to inform research, therapeutic approaches, or community support strategies</li>
+    </ol>
+    
+    <h5 class="mt-4">Privacy & Ethics</h5>
+    <p>We prioritize ethical data collection and analysis. All content is collected from public forums and processed anonymously. This tool is designed for research and professional development purposes only, not for clinical diagnosis or intervention planning without proper professional oversight.</p>
+    
+</div>
+</div> {% endblock %}
